@@ -31,12 +31,13 @@ const mutations = {
 const actions = {
   // 调用后端接口发起登录请求
   async login(context, data) {
+    // 经过响应拦截器的处理之后 这里的res就是token
+    // 能执行到这里说明业务肯定是正确的
     const res = await login(data)
     console.log(res)
-    if (res.data.success) {
-      // 数据请求成功 更新vuex中的token
-      context.commit('setToken', res.data.data)
-    }
+
+    // 数据请求成功 更新vuex中的token
+    context.commit('setToken', res)
   }
 }
 
