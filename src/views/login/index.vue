@@ -55,18 +55,18 @@
 </template>
 
 <script>
-// import { validUsername } from '@/utils/validate'
-
+import { validMobile } from '@/utils/validate'
+import { mapActions } from 'vuex'
 export default {
   name: 'Login',
   data() {
-    // const validateUsername = (rule, value, callback) => {
-    //   if (!validUsername(value)) {
-    //     callback(new Error('Please enter the correct user name'))
-    //   } else {
-    //     callback()
-    //   }
-    // }
+    const validateMobile = (rule, value, callback) => {
+      if (!validMobile(value)) {
+        callback(new Error('手机号格式错误'))
+      } else {
+        callback()
+      }
+    }
     // const validatePassword = (rule, value, callback) => {
     //   if (value.length < 6) {
     //     callback(new Error('The password can not be less than 6 digits'))
@@ -81,7 +81,7 @@ export default {
       },
       loginRules: {
         mobile: [{ required: true, trigger: 'blur', message: '手机号不能为空' },
-          { pattern: '/^1[3-9]\d{9}$/', message: '手机号格式不正确', trigger: 'blur' }],
+          { validator: validateMobile, trigger: 'blur' }],
         password: [{ required: true, trigger: 'blur', message: '密码不能为空' },
           { max: 16, min: 6, message: '密码长度必须在6-16之间' }]
       },
@@ -125,14 +125,24 @@ export default {
       //   }
       // })
 
-      this.$refs.loginForm.validate(isOK => {
+      this.$refs.loginForm.validate(async isOK => {
         if (isOK) {
           console.log('校验通过')
-        } else {
-          console.log('校验不通过')
+          try {
+            // 调用登录接口
+            await this['user/login'](this.loginForm)
+            // 进行路由跳转
+            this.$router.push('/')
+          } catch (error) {
+            console.log(error)
+          } finally {
+            // 不管登录成功与否都要关闭转圈
+            this.loading = false
+          }
         }
       })
-    }
+    },
+    ...mapActions(['user/login'])
   }
 }
 </script>

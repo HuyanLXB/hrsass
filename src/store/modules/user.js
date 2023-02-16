@@ -35,7 +35,6 @@ const actions = {
     // 能执行到这里说明业务肯定是正确的
     const res = await login(data)
     console.log(res)
-
     // 数据请求成功 更新vuex中的token
     context.commit('setToken', res)
   }
