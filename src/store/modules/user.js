@@ -62,6 +62,13 @@ const actions = {
     // 将获取到的数据更新到state中
     context.commit('setUserInfo', baseUserInfo)
     return res
+  },
+  // 用户登出
+  logout(context) {
+    // 删除用户信息
+    context.commit('removeUserInfo')
+    // 清空token
+    context.commit('removeToken')
   }
 }
 
