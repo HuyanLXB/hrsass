@@ -3,7 +3,11 @@ import Axios from 'axios'
 import { Promise } from 'core-js'
 import { Message } from 'element-ui'
 import store from '@/store'
+import { getTimeStamp } from '@/utils/auth'
+import router from '@/router'
 
+// 设置时间戳超时时间 单位为秒
+const timeout = 3600
 // 创建一个axios实例
 const service = Axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // 设置数据请求的基地址
@@ -31,9 +35,24 @@ service.interceptors.response.use(response => {
 })
 // 请求拦截器
 service.interceptors.request.use(config => {
-  // 在这里需要统一注入token
+  // 获取存入token时的时间戳
+  const timeStamp = getTimeStamp()
+  const isTimeOut = (Date.now() - timeStamp) / 1000
+
   if (store.getters.token) {
-    config.headers['Authorization'] = `Bearer ${store.getters.token}`
+    // 只有在存在token时才需要检查时间戳是否已经超时
+    if (isTimeOut < timeout) {
+      // 还未超时
+      // 在这里需要统一注入token
+      config.headers['Authorization'] = `Bearer ${store.getters.token}`
+    } else {
+    // 已经超时 退出登录 清除用户信息和过期的token
+      store.dispatch('user/logout')
+      // 跳转到登录页面
+      router.push('/login')
+      // 停止数据请求
+      return Promise.reject(new Error('token已过期'))
+    }
   }
 
   // 必须返回配置

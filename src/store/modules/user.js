@@ -1,5 +1,5 @@
 // 导入进行本地缓存的工具
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, setTimeStamp } from '@/utils/auth'
 // 导入登录接口
 import { login, getUserInfo, getUserInfoById } from '@/api/user'
 
@@ -48,6 +48,8 @@ const actions = {
     console.log(res)
     // 数据请求成功 更新vuex中的token
     context.commit('setToken', res)
+    // 设置存入token时的时间戳
+    setTimeStamp()
   },
   // 调用获取用户信息的接口 在进行页面跳转的时候进行访问
   async getUserInfo(context) {
