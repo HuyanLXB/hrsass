@@ -2,6 +2,7 @@
 import Axios from 'axios'
 import { Promise } from 'core-js'
 import { Message } from 'element-ui'
+import store from '@/store'
 
 // 创建一个axios实例
 const service = Axios.create({
@@ -29,7 +30,17 @@ service.interceptors.response.use(response => {
   return Promise.reject(error)
 })
 // 请求拦截器
-service.interceptors.request.use()
+service.interceptors.request.use(config => {
+  // 在这里需要统一注入token
+  if (store.getters.token) {
+    config.headers['Authorization'] = `Bearer ${store.getters.token}`
+  }
+
+  // 必须返回配置
+  return config
+}, error => {
+  return Promise.reject(error)
+})
 
 // 导出service实例
 export default service
