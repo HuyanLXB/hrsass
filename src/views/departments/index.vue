@@ -1,7 +1,7 @@
 <template>
   <el-card class="tree-card">
     <!-- 实现头部结构 -->
-    <tree-tools :tree-node="company" />
+    <tree-tools :tree-node="company" :is-root="true" />
 
     <!-- 实现静态的树形结构 -->
     <el-tree :data="departs" :props="defaultProps" :default-expand-all="true">
@@ -14,6 +14,8 @@
 </template>
 <script>
 import TreeTools from './components/tree-tools.vue'
+import { getDepartments } from '@/api/departments'
+import { tranListToTreeData } from '@/utils/index'
 export default {
   components: {
     TreeTools
@@ -24,12 +26,21 @@ export default {
         children: 'children', // 通过children属性来寻找节点的字节点
         label: 'name'// 通过name属性来显示节点的名称
       },
-      departs: [
-        { name: '总裁办', manager: '曹操', children: [{ name: '董事会', manager: '曹丕' }] },
-        { name: '行政部', manager: '刘备' },
-        { name: '人事部', manager: '孙权' }
-      ],
+      departs: [],
       company: { name: '重庆xxxxxx科技股份有限公司', manager: '负责人' }
+    }
+  },
+  created() {
+    this.loadDepartments()
+  },
+  methods: {
+    async loadDepartments() {
+      const { depts } = await getDepartments()
+      // 此时获得的公司列表是数组数据，子部门与父部门是平级的此时需要将其转换为树形结构
+      const tree = tranListToTreeData(depts, '')
+      this.departs = tree
+      console.log(depts)
+      console.log('转换之后的树形结构', tree)
     }
   }
 }

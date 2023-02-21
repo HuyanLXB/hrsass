@@ -115,3 +115,23 @@ export function param2Obj(url) {
   })
   return obj
 }
+
+// 将普通的数组结构数据转换为树形结构
+// 最开始的时候Pid为 "" 找到最外层的根节点
+// tranListToTreeData的作用就是根据pid找到符合的节点并返回对应的数据
+export function tranListToTreeData(list, thePid) {
+  const arr = []
+  list.forEach(item => {
+    if (item.pid === thePid) {
+      // 找它的子节点，子节点的pid === 父节点的id
+      const children = tranListToTreeData(list, item.id)
+      if (children.length) {
+        // 子节点长度大于0说明找到了子节点
+        item.children = children
+      }
+      arr.push(item)
+    }
+  })
+
+  return arr
+}
