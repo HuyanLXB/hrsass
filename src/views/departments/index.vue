@@ -1,65 +1,23 @@
 <template>
   <el-card class="tree-card">
     <!-- 实现头部结构 -->
-    <el-row type="flex" justify="space-between">
-      <el-col>
-        <span>重庆xxxxxx科技股份有限公司</span>
-      </el-col>
-      <el-col :span="4">
-        <el-row type="flex" justify="end">
-          <el-col>
-            <span>负责人</span>
-          </el-col>
-          <el-col>
-            <!-- 下拉菜单 -->
-            <el-dropdown>
-              <span>
-                操作<i class="el-icon-arrow-down" />
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>添加子部门</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </el-col>
-        </el-row>
-      </el-col>
-    </el-row>
+    <tree-tools :tree-node="company" />
 
     <!-- 实现静态的树形结构 -->
     <el-tree :data="departs" :props="defaultProps" :default-expand-all="true">
       <!-- 传入内容 插槽内容 会循环多次 有多少节点 就循环多少次 -->
       <!-- 作用域插槽 slot-scope="obj" 接收传递给插槽的数据   data 每个节点的数据对象-->
-      <el-row slot-scope="{ data }" type="flex" justify="space-between" align="middle" style="height: 40px; width: 100%">
-        <el-col>
-          <span>{{ data.name }}</span>
-        </el-col>
-        <el-col :span="4">
-          <el-row type="flex" justify="end">
-            <el-col>
-              <span>{{ data.manager }}</span>
-            </el-col>
-            <el-col>
-              <!-- 下拉菜单 -->
-              <el-dropdown>
-                <span>
-                  操作<i class="el-icon-arrow-down" />
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item>添加子部门</el-dropdown-item>
-                  <el-dropdown-item>编辑部门</el-dropdown-item>
-                  <el-dropdown-item>删除部门</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-col>
-          </el-row>
-        </el-col>
-      </el-row>
+      <tree-tools slot-scope="{ data }" :tree-node="data" />
     </el-tree>
 
   </el-card>
 </template>
 <script>
+import TreeTools from './components/tree-tools.vue'
 export default {
+  components: {
+    TreeTools
+  },
   data() {
     return {
       defaultProps: {
@@ -70,7 +28,8 @@ export default {
         { name: '总裁办', manager: '曹操', children: [{ name: '董事会', manager: '曹丕' }] },
         { name: '行政部', manager: '刘备' },
         { name: '人事部', manager: '孙权' }
-      ]
+      ],
+      company: { name: '重庆xxxxxx科技股份有限公司', manager: '负责人' }
     }
   }
 }
