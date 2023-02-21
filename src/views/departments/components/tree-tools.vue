@@ -44,6 +44,9 @@ export default {
     operateDepts(command) {
       if (command === 'add') {
         // 添加子部门部门
+
+        // 通知父组件展示新增部门的弹出层
+        this.$emit('addDepartments', this.treeNode) // 在新增部门时需要获得点击的当前节点的信息
       } else if (command === 'edit') {
         // 编辑部门
       } else {
