@@ -6,3 +6,11 @@ export function getDepartments() {
     method: 'GET'
   })
 }
+
+// 删除部门
+export function delDepartments(id) {
+  return request({
+    url: `/company/department/${id}`,
+    method: 'DELETE'
+  })
+}

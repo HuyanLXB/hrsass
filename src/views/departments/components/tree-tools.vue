@@ -10,14 +10,14 @@
         </el-col>
         <el-col>
           <!-- 下拉菜单 -->
-          <el-dropdown>
+          <el-dropdown @command="operateDepts">
             <span>
               操作<i class="el-icon-arrow-down" />
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>添加子部门</el-dropdown-item>
-              <el-dropdown-item v-if="!isRoot">编辑部门</el-dropdown-item>
-              <el-dropdown-item v-if="!isRoot">删除部门</el-dropdown-item>
+              <el-dropdown-item command="add">添加子部门</el-dropdown-item>
+              <el-dropdown-item v-if="!isRoot" command="edit">编辑部门</el-dropdown-item>
+              <el-dropdown-item v-if="!isRoot" command="del">删除部门</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </el-col>
@@ -25,9 +25,11 @@
     </el-col>
   </el-row>
 </template>
-<script>
 
+<script>
+import { delDepartments } from '@/api/departments'
 export default {
+  name: 'TreeTools',
   props: {
     treeNode: {
       required: true,
@@ -36,6 +38,25 @@ export default {
     isRoot: {
       type: Boolean,
       default: false
+    }
+  },
+  methods: {
+    operateDepts(command) {
+      if (command === 'add') {
+        // 添加子部门部门
+      } else if (command === 'edit') {
+        // 编辑部门
+      } else {
+        // 删除部门
+        this.$confirm('确定要删除该部门吗').then(async() => {
+          // 调用接口删除后端里面的数据
+          await delDepartments(this.treeNode.id)
+          //   删除数据成功
+          this.$message.success('删除部门成功')
+          //   通知父节点重新拉取部门列表数据
+          this.$emit('delDepartments')
+        })
+      }
     }
   }
 }
