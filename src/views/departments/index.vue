@@ -24,6 +24,7 @@
       :dialog-form-visible="dialogFormVisible"
       :current-node="currentNode"
       @closeAddDept="dialogFormVisible=false"
+      @addDepartments="loadDepartments"
     />
   </el-card>
 </template>

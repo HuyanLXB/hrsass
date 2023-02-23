@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="新增部门" :visible="dialogFormVisible" @close="$emit('closeAddDept')">
-    <el-form label-width="120px" :model="formData" :rules="rules">
+    <el-form ref="deptFrom" label-width="120px" :model="formData" :rules="rules">
       <el-form-item label="部门名称" prop="name">
         <el-input v-model="formData.name" style="width:80%" />
       </el-form-item>
@@ -35,7 +35,7 @@
     <el-row slot="footer" type="flex" justify="center">
       <!-- 列被分为24 -->
       <el-col :span="6">
-        <el-button type="primary" size="small">确定</el-button>
+        <el-button type="primary" size="small" @click="btnOk">确定</el-button>
         <el-button size="small" @click="$emit('closeAddDept')">取消</el-button>
       </el-col>
     </el-row>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { getDepartments } from '@/api/departments'
+import { getDepartments, addDepartments } from '@/api/departments'
 // import { getUserList } from '@/api/employees' 后端接口有问题无法获取员工数据
 
 export default {
@@ -132,6 +132,24 @@ export default {
         return array.indexOf(item) === index
       })
       console.log(this.peoples)
+    },
+    btnOk() {
+      this.$refs.deptFrom.validate(async isOk => {
+        if (isOk) {
+          // 表单校验通过后执行这里
+          console.log('校验通过')
+          // 调用后端接口进行新增部门的提交
+          const formData = { ...this.formData, pid: this.currentNode.id }
+          await addDepartments(formData)
+
+          // 新增部门成功通知父组件获取最新的部门列表数据
+          this.$emit('addDepartments')
+          // 关闭弹窗
+          this.$emit('closeAddDept')
+          // 成功通知
+          this.$message.success('新增部门成功')
+        }
+      })
     }
   }
 }
