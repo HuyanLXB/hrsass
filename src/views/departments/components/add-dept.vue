@@ -8,7 +8,19 @@
         <el-input v-model="formData.code" style="width:80%" />
       </el-form-item>
       <el-form-item label="部门负责人" prop="manager">
-        <el-select v-model="formData.manager" placeholder="请选择" style="width:80%" />
+        <el-select
+          v-model="formData.manager"
+          placeholder="请选择"
+          style="width:80%"
+          @focus="getUserList"
+        >
+          <el-option
+            v-for="(item,index) in peoples"
+            :key="index"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="部门介绍" prop="introuduce">
         <el-input
@@ -32,6 +44,8 @@
 
 <script>
 import { getDepartments } from '@/api/departments'
+// import { getUserList } from '@/api/employees' 后端接口有问题无法获取员工数据
+
 export default {
 
   name: 'AddDept',
@@ -90,7 +104,34 @@ export default {
           { required: true, message: '部门介绍不能为空', trigger: 'blur' },
           { max: 300, min: 1, message: '部门编码在1-300个字符', trigger: 'blur' }
         ]
-      }
+      },
+      peoples: []
+    }
+  },
+  methods: {
+    async getUserList() {
+      console.log('获取管理人员列表')
+      // const data = await getUserList()
+      const { depts } = await getDepartments()
+      // 把各部门的负责人都提取出来
+      depts.forEach(item => {
+        if (item.manager !== null) {
+          this.peoples.push(item.manager)
+        }
+      })
+      // 去掉重复的数据
+      // this.peoples.forEach((item, index, array) => {
+      //   if (this.peoples.some(value => value.manager === item.manager)) {
+      //     this.peoples.splice(index, 1)
+      //     console.log(item.manager)
+      //   }
+      // })
+
+      // 去掉重复的数据
+      this.peoples = this.peoples.filter((item, index, array) => {
+        return array.indexOf(item) === index
+      })
+      console.log(this.peoples)
     }
   }
 }
