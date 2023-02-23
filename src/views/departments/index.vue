@@ -1,7 +1,11 @@
 <template>
   <el-card class="tree-card">
     <!-- 实现头部结构 -->
-    <tree-tools :tree-node="company" :is-root="true" />
+    <tree-tools
+      :tree-node="company"
+      :is-root="true"
+      @addDepartments="addDepartments"
+    />
 
     <!-- 实现静态的树形结构 -->
     <el-tree :data="departs" :props="defaultProps" :default-expand-all="true">
@@ -15,7 +19,12 @@
       />
     </el-tree>
     <!-- 新增部门时的弹出框 -->
-    <add-dept :dialog-form-visible="dialogFormVisible" @closeAddDept="dialogFormVisible=false" />
+    <add-dept
+      v-if="dialogFormVisible"
+      :dialog-form-visible="dialogFormVisible"
+      :current-node="currentNode"
+      @closeAddDept="dialogFormVisible=false"
+    />
   </el-card>
 </template>
 <script>
@@ -35,7 +44,7 @@ export default {
         label: 'name'// 通过name属性来显示节点的名称
       },
       departs: [],
-      company: { name: '重庆xxxxxx科技股份有限公司', manager: '负责人' },
+      company: { name: '重庆xxxxxx科技股份有限公司', manager: '负责人', id: '' },
       dialogFormVisible: false,
       currentNode: {}
     }
