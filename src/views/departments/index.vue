@@ -16,13 +16,16 @@
         :tree-node="data"
         @delDepartments="loadDepartments"
         @addDepartments="addDepartments"
+        @editDepartments="editDepartments"
       />
     </el-tree>
-    <!-- 新增部门时的弹出框 -->
+    <!-- 新增和编辑部门时的弹出框 -->
     <add-dept
       v-if="dialogFormVisible"
+      ref="addDept"
       :dialog-form-visible="dialogFormVisible"
       :current-node="currentNode"
+      :status-code="statusCode"
       @closeAddDept="dialogFormVisible=false"
       @addDepartments="loadDepartments"
     />
@@ -47,7 +50,8 @@ export default {
       departs: [],
       company: { name: '重庆xxxxxx科技股份有限公司', manager: '负责人', id: '' },
       dialogFormVisible: false,
-      currentNode: {}
+      currentNode: {},
+      statusCode: 'add'// 判断弹出层是编辑状态还是新增状态
     }
   },
   created() {
@@ -65,6 +69,12 @@ export default {
     addDepartments(currentNode) {
       this.dialogFormVisible = true
       this.currentNode = currentNode
+      this.statusCode = 'add'
+    },
+    editDepartments(currentNode) {
+      this.dialogFormVisible = true
+      this.currentNode = currentNode
+      this.statusCode = 'edit'
     }
   }
 }

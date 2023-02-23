@@ -49,6 +49,8 @@ export default {
         this.$emit('addDepartments', this.treeNode) // 在新增部门时需要获得点击的当前节点的信息
       } else if (command === 'edit') {
         // 编辑部门
+        // 通知父组件展示弹出层
+        this.$emit('editDepartments', this.treeNode) // 在编辑部门时需要获得点击的当前节点的信息
       } else {
         // 删除部门
         this.$confirm('确定要删除该部门吗').then(async() => {

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="新增部门" :visible="dialogFormVisible" @close="$emit('closeAddDept')">
+  <el-dialog :title="showTitle" :visible="dialogFormVisible" @close="$emit('closeAddDept')">
     <el-form ref="deptFrom" label-width="120px" :model="formData" :rules="rules">
       <el-form-item label="部门名称" prop="name">
         <el-input v-model="formData.name" style="width:80%" />
@@ -22,9 +22,9 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="部门介绍" prop="introuduce">
+      <el-form-item label="部门介绍" prop="introduce">
         <el-input
-          v-model="formData.introuduce"
+          v-model="formData.introduce"
           style="width:80%"
           type="textarea"
           :rows="3"
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { getDepartments, addDepartments } from '@/api/departments'
+import { getDepartments, addDepartments, getDepartDetail, updateDepartments } from '@/api/departments'
 // import { getUserList } from '@/api/employees' 后端接口有问题无法获取员工数据
 
 export default {
@@ -57,6 +57,10 @@ export default {
     currentNode: {
       type: Object,
       required: true
+    },
+    statusCode: {
+      type: String,
+      required: true
     }
   },
   data() {
@@ -65,27 +69,45 @@ export default {
       // 1.获取后端最新的数据
       const { depts } = await getDepartments()
       console.log(depts)
-      // 2.进行部门名称的查重
+      if (this.statusCode === 'edit') {
+        // 编辑状态
+        // 同级部门中除了自己以外不能有相同的名称
+        // pid是等级id，同一级的数据其pid是相同的。id是个体id每个数据的id都是不一样的
+        const isRepeat = depts.filter(item => item.pid === this.currentNode.pid && item.id !== this.currentNode.id).some(item => item.name === value)
+        console.log(depts.filter(item => item.pid === this.currentNode.pid && item.id !== this.currentNode.id))
+        isRepeat ? callback(new Error('同级部门中已存在相同名称')) : callback()
+      } else {
+        // 新增状态
+        // 2.进行部门名称的查重
       // 2.1 找到新增子部门的同级部门
       // 2.2 判断新增部门名称是否有重复
-      const isRepeat = depts.filter(item => item.pid === this.currentNode.id).some(item => item.name === value)
+        const isRepeat = depts.filter(item => item.pid === this.currentNode.id).some(item => item.name === value)
 
-      isRepeat ? callback(new Error('同级部门中已存在相同名称')) : callback()
+        isRepeat ? callback(new Error('同级部门中已存在相同名称')) : callback()
+      }
     }
     const checkRepeatCode = async(rule, value, callback) => {
       // 整个组织模块中部门编码都不许重复
       // 1. 获取后端最新的数据
       const { depts } = await getDepartments()
-      // 2. 进行部门编码查重
-      const isRepeat = depts.some(item => item.code === value)
-      isRepeat ? callback(new Error('部门编码重复')) : callback()
+      if (this.statusCode === 'edit') {
+        // 编辑状态
+        // 把正在进行编辑的部门排除去之后进行查重
+        const isRepeat = depts.some(item => item.id !== this.currentNode.id && item.code === value && value)
+        isRepeat ? callback(new Error('部门编码重复')) : callback()
+      } else {
+        // 新增状态
+        // 2. 进行部门编码查重
+        const isRepeat = depts.some(item => item.code === value)
+        isRepeat ? callback(new Error('部门编码重复')) : callback()
+      }
     }
     return {
       formData: {
         name: '', // 部门名称
         code: '', // 部门编码
         manager: '', // 部门负责人
-        introuduce: '' // 部门介绍
+        introduce: '' // 部门介绍
       },
       rules: {
         name: [
@@ -106,6 +128,16 @@ export default {
         ]
       },
       peoples: []
+    }
+  },
+  computed: {
+    showTitle() {
+      return this.statusCode === 'edit' ? '编辑部门' : '新增子部门'
+    }
+  },
+  created() {
+    if (this.statusCode === 'edit') {
+      this.getDepartDetail(this.currentNode.id)
     }
   },
   methods: {
@@ -136,20 +168,32 @@ export default {
     btnOk() {
       this.$refs.deptFrom.validate(async isOk => {
         if (isOk) {
-          // 表单校验通过后执行这里
-          console.log('校验通过')
-          // 调用后端接口进行新增部门的提交
-          const formData = { ...this.formData, pid: this.currentNode.id }
-          await addDepartments(formData)
-
+          if (this.statusCode === 'edit') {
+            // 编辑状态
+            console.log('编辑状态校验通过')
+            const res = await updateDepartments(this.formData)
+            console.log(res)
+          } else {
+            // 新增状态
+            // 表单校验通过后执行这里
+            console.log('校验通过')
+            // 调用后端接口进行新增部门的提交
+            const formData = { ...this.formData, pid: this.currentNode.id }
+            await addDepartments(formData)
+          }
           // 新增部门成功通知父组件获取最新的部门列表数据
           this.$emit('addDepartments')
           // 关闭弹窗
           this.$emit('closeAddDept')
           // 成功通知
-          this.$message.success('新增部门成功')
+          this.$message.success('更新部门成功')
         }
       })
+    },
+    async getDepartDetail(id) {
+      const res = await getDepartDetail(id)
+      console.log(res)
+      this.formData = res
     }
   }
 }
