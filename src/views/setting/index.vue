@@ -10,6 +10,7 @@
                 type="primary"
                 size="small"
                 icon="el-icon-plus"
+                @click="dialogFormVisible=true"
               >新增角色</el-button>
             </el-row>
             <!-- 展示数据的表格 -->
@@ -21,8 +22,16 @@
                 <!-- 作用域插槽 row 能获取到点击那一行的数据对象 -->
                 <template slot-scope="{ row }">
                   <el-button size="small" type="success">分配权限</el-button>
-                  <el-button size="small" type="primary">编辑</el-button>
-                  <el-button size="small" type="danger" @click="deletRole(row)">删除</el-button>
+                  <el-button
+                    size="small"
+                    type="primary"
+                    @click="editRole(row)"
+                  >编辑</el-button>
+                  <el-button
+                    size="small"
+                    type="danger"
+                    @click="deletRole(row)"
+                  >删除</el-button>
                 </template>
               </el-table-column>
 
@@ -63,11 +72,33 @@
           </el-tab-pane>
         </el-tabs>
       </el-card>
+
+      <!-- 新增和编辑时的弹层 -->
+      <el-dialog
+        v-if="dialogFormVisible"
+        title="收货地址"
+        :visible.sync="dialogFormVisible"
+        :before-close="handleClose"
+      >
+        <el-form ref="editForm" :model="formData" :rules="rule" label-width="120px">
+          <el-form-item label="角色名称" prop="name">
+            <el-input v-model="formData.name" />
+          </el-form-item>
+          <el-form-item label="角色描述">
+            <el-input v-model="formData.description" />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="handleClose">取 消</el-button>
+          <el-button type="primary" @click="btnOK">确 定</el-button>
+        </div>
+      </el-dialog>
+
     </div>
   </div>
 </template>
 <script>
-import { getRoleList, getCompanyInfo, deleteRole } from '@/api/setting'
+import { getRoleList, getCompanyInfo, deleteRole, updateRole, getRoleInfo, addRole } from '@/api/setting'
 import { mapGetters } from 'vuex'
 export default {
   name: 'Setting',
@@ -84,7 +115,15 @@ export default {
         companyAddress: '',
         mailbox: '',
         remarks: ''
-      } // 记录公司信息
+      }, // 记录公司信息
+      dialogFormVisible: false,
+      formData: {
+        name: '',
+        description: ''
+      },
+      rule: {
+        name: [{ required: true, message: '名称不能为空', trigger: 'blur' }]
+      }
 
     }
   },
@@ -125,6 +164,67 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    async editRole(row) {
+      this.dialogFormVisible = true
+      try {
+        // 调用接口获取角色信息
+        const res = await getRoleInfo(row.id)
+        // 实现数据回写
+        this.formData = res
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async btnOK() {
+      if (this.formData.id) {
+        // id存在表明是编辑状态
+        try {
+        // 点击确定时要先进行表单校验
+          await this.$refs.editForm.validate()
+          // 校验通过了才会执行下面的代码
+          try {
+            // 调用接口更改角色信息
+            const res2 = await updateRole(this.formData)
+            console.log(res2)
+            // 重新获取数据
+            this.getRoleList()
+            // 消息提示
+            this.$message.success('操作成功')
+          } catch (error) {
+            console.log(error)
+          }
+          // 关闭弹窗
+          this.dialogFormVisible = false
+        } catch (error) {
+          console.log(error)
+        }
+      } else {
+        // id不存在是新增状态
+        console.log('新增')
+        try {
+          // 调用接口
+          await addRole(this.formData)
+          // 重新获取数据
+          this.getRoleList()
+          // 消息提醒
+          this.$message.success('新增成功')
+          // 关闭弹窗
+          this.handleClose()
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    },
+    handleClose() {
+      console.log('清空数据')
+      // 清空数据
+      this.formData = {
+        name: '',
+        description: ''
+      }
+      // 关闭弹窗
+      this.dialogFormVisible = false
     }
   }
 

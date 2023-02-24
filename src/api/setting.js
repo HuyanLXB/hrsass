@@ -24,3 +24,30 @@ export function deleteRole(id) {
     method: 'DELETE'
   })
 }
+
+// 编辑角色
+export function updateRole(data) {
+  return request({
+    url: `/sys/role/${data.id}`,
+    method: 'PUT',
+    data
+  })
+}
+
+// 获取角色详情
+export function getRoleInfo(id) {
+  return request({
+    url: `/sys/role/${id}`,
+    method: 'GET'
+
+  })
+}
+
+// 新增角色
+export function addRole(data) {
+  return request({
+    url: `/sys/role`,
+    method: 'POST',
+    data
+  })
+}
