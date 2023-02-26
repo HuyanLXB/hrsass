@@ -107,7 +107,7 @@ export default {
       list: [], // 用来承接获取到的角色信息
       page: {
         page: 1,
-        pagesize: 5,
+        pagesize: 7,
         total: 0// 记录总数
       },
       CompanyInfo: {
