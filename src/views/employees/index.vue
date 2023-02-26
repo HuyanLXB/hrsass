@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="app-container">
       <PageToll :show-before="true">
-        <span slot="before">共20条数据</span>
+        <span slot="before">共{{ page.total }}条数据</span>
         <template slot="after">
           <el-button size="small" type="warning">导入员工</el-button>
           <el-button size="small" type="danger">导出员工</el-button>
@@ -11,14 +11,32 @@
       </PageToll>
       <el-card>
         <!-- 表格区域 -->
-        <el-table>
-          <el-table-column label="序号" sortable="" />
-          <el-table-column label="姓名" sortable="" />
-          <el-table-column label="工号" sortable="" />
-          <el-table-column label="聘用形式" sortable="" />
-          <el-table-column label="部门" sortable="" />
-          <el-table-column label="入职时间" sortable="" />
-          <el-table-column label="账户状态" sortable="" />
+        <el-table :data="userInfo" border="">
+          <el-table-column type="index" label="序号" sortable="" />
+          <el-table-column prop="username" label="姓名" sortable="" />
+          <el-table-column prop="staffPhoto" label="头像">
+            <template slot-scope="{ row }">
+              <img
+                v-if="row.staffPhoto === ''"
+                :src="row.staffPhoto === ''? img : row.staffPhoto"
+                alt=""
+                style="width:100% ;height:auto"
+                @click="showRow(row)"
+              >
+              <img
+                v-else
+                v-imageError="img"
+                :src="row.staffPhoto"
+                style="width:100% ;height:auto"
+              >
+            </template>
+          </el-table-column>
+          <el-table-column prop="mobile" label="手机号" sortable="" />
+          <el-table-column prop="workNumber" label="工号" sortable="" />
+          <el-table-column prop="formOfEmployment" label="聘用形式" sortable="" />
+          <el-table-column prop="departmentName" label="部门" sortable="" />
+          <el-table-column prop="timeOfEntry" label="入职时间" sortable="" />
+          <el-table-column prop="enableState" label="账户状态" sortable="" />
           <el-table-column label="操作">
             <el-button type="text" size="small">查看</el-button>
             <el-button type="text" size="small">转正</el-button>
@@ -29,13 +47,22 @@
           </el-table-column>
         </el-table>
         <!-- 分页组件 -->
-        <el-row type="flex" justify="center" style="hight:60px" align="middle">
+        <!-- <el-row type="flex" justify="center" style="hight:60px" align="middle">
           <el-pagination
             layout="prev, pager, next"
-            :total="page.total"
             :page-size="page.pagesize"
+            :total="page.total"
             :current-page="page.page"
             @current-change="pageChange"
+          />
+        </el-row> -->
+        <el-row type="flex" justify="center" align="middle" style="height: 60px">
+          <el-pagination
+            layout="prev, pager, next"
+            :page-size="page.size"
+            :current-page="page.page"
+            :total="page.total"
+            @current-change="changePage"
           />
         </el-row>
       </el-card>
@@ -43,20 +70,54 @@
   </div>
 </template>
 <script>
+import { getUserList } from '@/api/employees'
 export default {
   name: 'Employees',
   data() {
     return {
       page: {
         page: 1,
-        pagesize: 7,
+        pagesize: 6,
         total: 0// 记录总数
-      }
+      },
+      userInfo: [
+        {
+          timeOfEntry: '',
+          departmentName: '',
+          formOfEmployment: 1,
+          mobile: '',
+          staffPhoto: '',
+          username: '',
+          workNumber: '',
+          enableState: ''
+        }
+      ],
+      img: require('@/assets/common/head.jpg')
     }
   },
+  created() {
+    this.loadUserInfo()
+  },
   methods: {
-    pageChange() {
-      console.log('页数发生变化')
+    changePage(value) {
+      console.log('页数发生变化', value)
+      // 设置请求的新页数
+      this.page.page = value
+      // 重新发起请求
+      this.loadUserInfo()
+    },
+    async loadUserInfo() {
+      try {
+        const res = await getUserList(this.page)
+        this.page.total = res.total
+        this.userInfo = [...res.rows]
+        console.log(res)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    showRow(row) {
+      console.log(row)
     }
   }
 }
