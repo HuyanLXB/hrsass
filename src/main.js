@@ -12,6 +12,7 @@ import App from './App'
 import store from './store'
 import router from './router'
 import * as directives from '@/directives'
+import * as filters from '@/filters'
 
 import '@/icons' // icon
 import '@/permission' // permission control
@@ -40,6 +41,12 @@ Vue.config.productionTip = false
 Object.keys(directives).forEach(key => {
   // 注册自定义指令
   Vue.directive(key, directives.imageError)
+})
+
+// 给所有的过滤器进行全局注册
+Object.keys(filters).forEach(key => {
+  // 注册自定义指令
+  Vue.filter(key, filters[key])
 })
 
 new Vue({

@@ -21,7 +21,6 @@
                 :src="row.staffPhoto === ''? img : row.staffPhoto"
                 alt=""
                 style="width:100% ;height:auto"
-                @click="showRow(row)"
               >
               <img
                 v-else
@@ -33,9 +32,13 @@
           </el-table-column>
           <el-table-column prop="mobile" label="手机号" sortable="" />
           <el-table-column prop="workNumber" label="工号" sortable="" />
-          <el-table-column prop="formOfEmployment" label="聘用形式" sortable="" />
+          <el-table-column prop="formOfEmployment" label="聘用形式" sortable="" :formatter="formatEmployment" />
           <el-table-column prop="departmentName" label="部门" sortable="" />
-          <el-table-column prop="timeOfEntry" label="入职时间" sortable="" />
+          <el-table-column prop="timeOfEntry" label="入职时间" sortable="">
+            <template slot-scope="{ row }">
+              {{ row.timeOfEntry|formatDate }}
+            </template>
+          </el-table-column>
           <el-table-column prop="enableState" label="账户状态" sortable="" />
           <el-table-column label="操作">
             <el-button type="text" size="small">查看</el-button>
@@ -71,6 +74,7 @@
 </template>
 <script>
 import { getUserList } from '@/api/employees'
+import EmployeeEnum from '@/api/constant/employees'
 export default {
   name: 'Employees',
   data() {
@@ -116,8 +120,12 @@ export default {
         console.log(error)
       }
     },
-    showRow(row) {
-      console.log(row)
+    formatEmployment(cellValue) {
+      // console.log(cellValue)
+      // 去寻找1 2 对应的值
+      const res = EmployeeEnum.hireType.find(item => item.id === Number(cellValue.enableState))
+
+      return res ? res.value : '未知'
     }
   }
 }
