@@ -12,11 +12,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import PageToll from '@/components/PageTools'
+
 export default {
   name: 'Dashboard',
   components: {
-    PageToll
+
   },
   computed: {
     ...mapGetters([
