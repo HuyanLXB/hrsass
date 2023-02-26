@@ -41,12 +41,14 @@
           </el-table-column>
           <el-table-column prop="enableState" label="账户状态" sortable="" />
           <el-table-column label="操作">
-            <el-button type="text" size="small">查看</el-button>
-            <el-button type="text" size="small">转正</el-button>
-            <el-button type="text" size="small">调岗</el-button>
-            <el-button type="text" size="small">离职</el-button>
-            <el-button type="text" size="small">角色</el-button>
-            <el-button type="text" size="small">删除</el-button>
+            <template slot-scope="{ row }">
+              <el-button type="text" size="small">查看</el-button>
+              <el-button type="text" size="small">转正</el-button>
+              <el-button type="text" size="small">调岗</el-button>
+              <el-button type="text" size="small">离职</el-button>
+              <el-button type="text" size="small">角色</el-button>
+              <el-button type="text" size="small" @click="delUser(row.id)">删除</el-button>
+            </template>
           </el-table-column>
         </el-table>
         <!-- 分页组件 -->
@@ -73,7 +75,7 @@
   </div>
 </template>
 <script>
-import { getUserList } from '@/api/employees'
+import { getUserList, delEmployee } from '@/api/employees'
 import EmployeeEnum from '@/api/constant/employees'
 export default {
   name: 'Employees',
@@ -126,6 +128,19 @@ export default {
       const res = EmployeeEnum.hireType.find(item => item.id === Number(cellValue.enableState))
 
       return res ? res.value : '未知'
+    },
+    async delUser(id) {
+      try {
+        await this.$confirm('确定要删除该用户？')
+        const res = await delEmployee(id)
+        console.log(res)
+        // 重新获取数据
+        this.loadUserInfo()
+        // 消息提醒
+        this.$message.success('删除用户成功')
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 }
