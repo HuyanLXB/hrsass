@@ -6,7 +6,7 @@
         <template slot="after">
           <el-button size="small" type="warning">导入员工</el-button>
           <el-button size="small" type="danger">导出员工</el-button>
-          <el-button size="small" type="primary">新增员工</el-button>
+          <el-button size="small" type="primary" @click="addEmployee">新增员工</el-button>
         </template>
       </PageToll>
       <el-card>
@@ -72,13 +72,23 @@
         </el-row>
       </el-card>
     </div>
+    <!-- 弹窗 -->
+    <AddEmployee
+      v-if="dialogFormVisible"
+      :dialog-form-visible="dialogFormVisible"
+      @closeAddDept="dialogFormVisible = false"
+    />
   </div>
 </template>
 <script>
 import { getUserList, delEmployee } from '@/api/employees'
 import EmployeeEnum from '@/api/constant/employees'
+import AddEmployee from './components/add-employee.vue'
 export default {
   name: 'Employees',
+  components: {
+    AddEmployee
+  },
   data() {
     return {
       page: {
@@ -98,7 +108,8 @@ export default {
           enableState: ''
         }
       ],
-      img: require('@/assets/common/head.jpg')
+      img: require('@/assets/common/head.jpg'),
+      dialogFormVisible: false
     }
   },
   created() {
@@ -141,6 +152,9 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    addEmployee() {
+      this.dialogFormVisible = true
     }
   }
 }

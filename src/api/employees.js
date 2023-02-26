@@ -16,3 +16,12 @@ export function delEmployee(id) {
     method: 'DELETE'
   })
 }
+
+// 新增员工
+export function addEmployee(data) {
+  return request({
+    url: `/sys/user`,
+    method: 'POST',
+    data
+  })
+}
