@@ -144,6 +144,7 @@ export default {
     },
     handleNodeClick(data) {
       console.log(data)
+      //   点击树形结构的节点之后把节点数据回写到输入框中
       this.addUserInfo.departmentName = data.name
       //   关闭树形结构
       this.isShowTree = false

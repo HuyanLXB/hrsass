@@ -25,3 +25,12 @@ export function addEmployee(data) {
     data
   })
 }
+
+// 批量导入员工 导入的参数是数组类型的
+export function importEmployee(data) {
+  return request({
+    url: `/sys/user/batch`,
+    method: 'POST',
+    data
+  })
+}

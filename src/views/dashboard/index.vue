@@ -6,6 +6,7 @@
       <el-button slot="after">新增人员</el-button>
       <el-button slot="after">新增人员</el-button>
     </PageToll>
+    <UploadExcel />
   </div>
 
 </template>

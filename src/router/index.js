@@ -62,6 +62,16 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
+  {
+    path: '/import',
+    name: 'import',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: '', // 二级路由不写路径表示是默认路由
+      component: () => import('@/components/UploadExcel')
+    }]
+  },
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
