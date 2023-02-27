@@ -10,7 +10,7 @@
                 type="primary"
                 size="small"
                 icon="el-icon-plus"
-                @click="dialogFormVisible=true"
+                @click="addRole('add')"
               >新增角色</el-button>
             </el-row>
             <!-- 展示数据的表格 -->
@@ -25,7 +25,7 @@
                   <el-button
                     size="small"
                     type="primary"
-                    @click="editRole(row)"
+                    @click="editRole(row,'edit')"
                   >编辑</el-button>
                   <el-button
                     size="small"
@@ -76,7 +76,7 @@
       <!-- 新增和编辑时的弹层 -->
       <el-dialog
         v-if="dialogFormVisible"
-        title="收货地址"
+        :title="statueCode === 'edit' ? '编辑角色' : '新增角色'"
         :visible.sync="dialogFormVisible"
         :before-close="handleClose"
       >
@@ -123,7 +123,8 @@ export default {
       },
       rule: {
         name: [{ required: true, message: '名称不能为空', trigger: 'blur' }]
-      }
+      },
+      statueCode: 'add'
 
     }
   },
@@ -165,8 +166,9 @@ export default {
         console.log(error)
       }
     },
-    async editRole(row) {
+    async editRole(row, statueCode) {
       this.dialogFormVisible = true
+      this.statueCode = statueCode
       try {
         // 调用接口获取角色信息
         const res = await getRoleInfo(row.id)
@@ -225,6 +227,10 @@ export default {
       }
       // 关闭弹窗
       this.dialogFormVisible = false
+    },
+    addRole(statueCode) {
+      this.dialogFormVisible = true
+      this.statueCode = statueCode
     }
   }
 

@@ -5,7 +5,7 @@
         <span slot="before">共{{ page.total }}条数据</span>
         <template slot="after">
           <el-button size="small" type="warning" @click="$router.push('/import?type=user')">导入员工</el-button>
-          <el-button size="small" type="danger">导出员工</el-button>
+          <el-button size="small" type="danger" @click="exportData">导出员工</el-button>
           <el-button size="small" type="primary" @click="addEmployee">新增员工</el-button>
         </template>
       </PageToll>
@@ -155,6 +155,87 @@ export default {
     },
     addEmployee() {
       this.dialogFormVisible = true
+    },
+    exportData() {
+      console.log('导出数据')
+      // 因为后端的数据key是英文的所以需要一个汉英对应关系
+      const headers = {
+        '手机号': 'mobile',
+        '姓名': 'username',
+        '入职日期': 'timeOfEntry',
+        '聘用形式': 'formOfEmployment',
+        '转正日期': 'correctionTime',
+        '工号': 'workNumber',
+        '部门': 'departmentName'
+      }
+      // 懒加载插件进行Excel导出
+      import('@/vendor/Export2Excel').then(async excel => {
+        // 调用接口请求数据
+        // 这样就能通过一次请求获取到全部的数据
+        const { rows } = await getUserList({ page: 1, size: this.page.total })
+        // console.log(rows)
+        // 将数组对象转化为二维数组以便于导出
+        const data = this.formatJson(rows, headers)
+        // console.log(data)
+        excel.export_json_to_excel({
+          header: Object.keys(headers), // 表头 必填
+          data, // 具体数据 必填
+          filename: '员工数据', // 非必填
+          autoWidth: true, // 非必填
+          bookType: 'xlsx' // 非必填
+        })
+      })
+    },
+    formatJson(rows, headers) {
+      // 该方法负责让一维数组对象变成二维数组
+      // [{ username: '张三'},{},{}]  => [[’张三'],[],[]]
+      const arr = []
+      // 1.先遍历对象
+      rows.forEach(item => {
+        const userInfo = []
+        // 2. 再遍历表头，使得后端获得的数据按照表头的顺序被放到数组中
+        Object.keys(headers).forEach(key => {
+          if (headers[key] === 'timeOfEntry' || headers[key] === 'correctionTime') {
+            userInfo.push(this.formatDate(item[headers[key]]))
+            // userInfo.push(item[headers[key]])
+          } else if (headers[key] === 'formOfEmployment') {
+            // 返回的是一个对象
+            const isIn = EmployeeEnum.hireType.find(value => value.id === Number(item[headers[key]]))
+            const hireType = isIn ? isIn.value : '未知'
+            userInfo.push(hireType)
+          } else {
+            userInfo.push(item[headers[key]])
+          }
+        })
+        arr.push(userInfo)
+      })
+
+      return arr
+    },
+    formatDate(date, fmt = 'yyyy-MM-dd') {
+      if (!(date instanceof Array)) {
+        date = new Date(date)
+      }
+      if (/(y+)/.test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
+      }
+      const o = {
+        'M+': date.getMonth() + 1,
+        'd+': date.getDate(),
+        'h+': date.getHours(),
+        'm+': date.getMinutes(),
+        's+': date.getSeconds()
+      }
+      for (const k in o) {
+        if (new RegExp(`(${k})`).test(fmt)) {
+          const str = o[k] + ''
+          fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : this.padLeftZero(str))
+        }
+      }
+      return fmt
+    },
+    padLeftZero(str) {
+      return ('00' + str).substr(str.length)
     }
   }
 }
