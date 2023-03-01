@@ -18,6 +18,9 @@ import '@/icons' // icon
 import '@/permission' // permission control
 import Components from '@/components'
 Vue.use(Components) // 对自己的插件进行全局注册
+// 注册打印插件
+import Print from 'vue-print-nb'
+Vue.use(Print)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

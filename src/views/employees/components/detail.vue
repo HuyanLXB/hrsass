@@ -16,10 +16,25 @@
         </el-form>
       </el-tab-pane>
       <el-tab-pane label="个人详情">
+        <!-- 打印页面的跳转页面 -->
+        <el-row type="flex" justify="end">
+          <el-tooltip content="打印个人基本信息">
+            <router-link :to="`/employees/print/${userId}?type=personal`">
+              <i class="el-icon-printer" />
+            </router-link>
+          </el-tooltip>
+        </el-row>
         <!-- 动态组件技术 -->
         <component :is="componentsName[0]" />
       </el-tab-pane>
       <el-tab-pane label="岗位信息">
+        <el-row type="flex" justify="end">
+          <el-tooltip content="打印岗位信息">
+            <router-link :to="`/employees/print/${userId}?type=job`">
+              <i class="el-icon-printer" />
+            </router-link>
+          </el-tooltip>
+        </el-row>
         <component :is="componentsName[1]" />
       </el-tab-pane>
     </el-tabs>
@@ -47,7 +62,8 @@ export default {
         password2: [{ required: true, message: '密码不能为空', trigger: 'blur' },
           { min: 6, max: 9, message: '密码长度6-9位', trigger: 'blur' }]
       },
-      componentsName: ['UserInfo', 'JobInfo']
+      componentsName: ['UserInfo', 'JobInfo'],
+      userId: this.$route.params.id
 
     }
   },
