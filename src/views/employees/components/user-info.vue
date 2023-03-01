@@ -58,7 +58,7 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
-
+            <ImgUpload ref="staffPhoto" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -90,6 +90,7 @@
 
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <ImgUpload ref="personalPhoto" />
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -363,17 +364,33 @@ export default {
   },
   methods: {
     async savePersonal() {
+      // 读取上传组件里的图片数据
+      const fileList = this.$refs.personalPhoto.fileList
+      // 判断组件里的图片是否已经上传成功
+      if (fileList.some(item => item.upload === false)) {
+        this.$message.warning('图片还未上传成功')
+        return
+      }
       try {
-        await updatePersonal(this.formData)
+        await updatePersonal({ ...this.formData, staffPhoto: fileList && fileList.length ? fileList[0].url : '' })
+
         // 消息提示
         this.$message.success('保存用户详细消息成功')
       } catch (error) {
         console.log('保存用户详细信息失败')
+        console.log(error)
       }
     },
     async saveUser() {
+      // 读取上传组件里的图片数据
+      const fileList = this.$refs.staffPhoto.fileList
+      // 判断组件里的图片是否已经上传成功
+      if (fileList.some(item => item.upload === false)) {
+        this.$message.warning('图片还未上传成功')
+        return
+      }
       try {
-        await saveUserInfoById(this.userInfo)
+        await saveUserInfoById({ ...this.userInfo, staffPhoto: fileList && fileList.length ? fileList[0].url : '' })
         // 消息提示
         this.$message.success('保存用户基本信息成功')
       } catch (error) {
@@ -384,6 +401,10 @@ export default {
       try {
         const res = await getUserInfoById(this.userId)
         this.userInfo = res
+        // 将获取到的图片数据赋值给图片上传组件
+        if (this.userInfo.staffPhoto) {
+          this.$refs.staffPhoto.fileList.push({ url: this.userInfo.staffPhoto, upload: true })
+        }
       } catch (error) {
         console.log('获取用户基本信息失败')
       }
@@ -391,6 +412,10 @@ export default {
     async loadPersonalDetail() {
       try {
         this.formData = await getPersonalDetail(this.userId)
+        // 将获取到的图片数据赋值给图片上传组件
+        if (this.formData.staffPhoto) {
+          this.$refs.personalPhoto.fileList.push({ url: this.formData.staffPhoto, upload: true })
+        }
       } catch (error) {
         console.log('获取个人详细信息失败')
       }
