@@ -21,12 +21,14 @@
                 :src="row.staffPhoto === ''? img : row.staffPhoto"
                 alt=""
                 style="width:100% ;height:auto"
+                @click="showQrcode(row.staffPhoto)"
               >
               <img
                 v-else
                 v-imageError="img"
                 :src="row.staffPhoto"
                 style="width:100% ;height:auto"
+                @click="showQrcode(row.staffPhoto)"
               >
             </template>
           </el-table-column>
@@ -78,12 +80,19 @@
       :dialog-form-visible="dialogFormVisible"
       @closeAddDept="dialogFormVisible = false"
     />
+    <!-- 头像二维码弹窗 -->
+    <el-dialog :visible.sync="qrCodeVisible" title="头像二维码">
+      <el-row type="flex" justify="center">
+        <canvas ref="qrCode" />
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 <script>
 import { getUserList, delEmployee } from '@/api/employees'
 import EmployeeEnum from '@/api/constant/employees'
 import AddEmployee from './components/add-employee.vue'
+import QrCode from 'qrcode'
 export default {
   name: 'Employees',
   components: {
@@ -109,7 +118,8 @@ export default {
         }
       ],
       img: require('@/assets/common/head.jpg'),
-      dialogFormVisible: false
+      dialogFormVisible: false,
+      qrCodeVisible: false
     }
   },
   created() {
@@ -236,6 +246,23 @@ export default {
     },
     padLeftZero(str) {
       return ('00' + str).substr(str.length)
+    },
+    showQrcode(url) {
+      if (url) {
+        console.log(url)
+        // 展示弹窗
+        this.qrCodeVisible = true
+        // 转换二维码
+        // 因为数据更新是异步的，在弹窗刚渲染出来时去获取dom对象是获取不到的
+        // QrCode.toCanvas(this.$refs.qrCode, url)
+        // 该方法可以在页面渲染完之后再执行操作，此时是可以获取到dom对象的
+        this.$nextTick(() => {
+          QrCode.toCanvas(this.$refs.qrCode, url)
+          // 如果转化的二维码后面信息 是一个地址的话 就会跳转到该地址 如果不是地址就会显示内容
+        })
+      } else {
+        this.$message.warning('您还没有上传头像')
+      }
     }
   }
 }
