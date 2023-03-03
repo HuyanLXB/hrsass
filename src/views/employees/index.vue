@@ -48,7 +48,7 @@
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
-              <el-button type="text" size="small">角色</el-button>
+              <el-button type="text" size="small" @click="assingRole(row.id)">角色</el-button>
               <el-button type="text" size="small" @click="delUser(row.id)">删除</el-button>
             </template>
           </el-table-column>
@@ -86,17 +86,25 @@
         <canvas ref="qrCode" />
       </el-row>
     </el-dialog>
+    <!-- 分配角色的弹窗 -->
+    <AssignRole
+      ref="assignRole"
+      :user-id="userId"
+      :show-dialog.sync="assignRoleVisible"
+    />
   </div>
 </template>
 <script>
 import { getUserList, delEmployee } from '@/api/employees'
 import EmployeeEnum from '@/api/constant/employees'
 import AddEmployee from './components/add-employee.vue'
+import AssignRole from './components/assign-role.vue'
 import QrCode from 'qrcode'
 export default {
   name: 'Employees',
   components: {
-    AddEmployee
+    AddEmployee,
+    AssignRole
   },
   data() {
     return {
@@ -119,7 +127,9 @@ export default {
       ],
       img: require('@/assets/common/head.jpg'),
       dialogFormVisible: false,
-      qrCodeVisible: false
+      qrCodeVisible: false,
+      assignRoleVisible: false,
+      userId: ''
     }
   },
   created() {
@@ -263,6 +273,15 @@ export default {
       } else {
         this.$message.warning('您还没有上传头像')
       }
+    },
+    async assingRole(userId) {
+      console.log('执行了')
+      this.userId = userId
+      // 调用子组件的方法重新拉取数据
+      await this.$refs.assignRole.loadRoleList()
+      await this.$refs.assignRole.loadUserInfo()
+      // 展示弹窗
+      this.assignRoleVisible = true
     }
   }
 }

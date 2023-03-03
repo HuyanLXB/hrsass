@@ -220,7 +220,7 @@
               <td colspan="4" class="centInfo">基本信息</td>
             </tr>
             <tr>
-              <th style="width:10%">姓名</th>
+              <th style="width:10%">岗位名称</th>
               <td style="width:40%">{{ formData.username }}</td>
               <th style="width:10%">入职日期</th>
               <td style="width:40%">{{ formData.dateOfEntry }}</td>
