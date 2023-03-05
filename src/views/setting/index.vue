@@ -24,7 +24,7 @@
                   <el-button
                     size="small"
                     type="success"
-                    @click="assignPerm"
+                    @click="assignPerm(row.id)"
                   >分配权限</el-button>
                   <el-button
                     size="small"
@@ -102,20 +102,25 @@
       <el-dialog
         :visible.sync="showPermDialog"
         title="分配权限"
+        @close="btnAssignCancel"
       >
         <el-tree
-          :data="data"
+          ref="treeData"
+          :data="permData"
           show-checkbox
           node-key="id"
           :default-expand-all="true"
+          :check-on-click-node="true"
           :check-strictly="true"
           :props="defaultProps"
+          :default-checked-keys="permIds"
+          @node-click="handleNodeClick"
         />
         <!-- 底部确认标签 -->
         <el-row type="flex" justify="center">
           <el-col :span="6">
-            <el-button size="small">取消</el-button>
-            <el-button type="primary" size="small">确认</el-button>
+            <el-button size="small" @click="btnAssignCancel">取消</el-button>
+            <el-button type="primary" size="small" @click="btnAssignOk">确认</el-button>
           </el-col>
         </el-row>
       </el-dialog>
@@ -125,6 +130,8 @@
 <script>
 import { getRoleList, getCompanyInfo, deleteRole, updateRole, getRoleInfo, addRole, assignPerm } from '@/api/setting'
 import { mapGetters } from 'vuex'
+import { getPermissionList } from '@/api/permission'
+import { tranListToTreeData } from '@/utils'
 export default {
   name: 'Setting',
   data() {
@@ -151,45 +158,13 @@ export default {
       },
       statueCode: 'add',
       showPermDialog: false,
-      data: [{
-        id: 1,
-        label: '一级 1',
-        children: [{
-          id: 4,
-          label: '二级 1-1',
-          children: [{
-            id: 9,
-            label: '三级 1-1-1'
-          }, {
-            id: 10,
-            label: '三级 1-1-2'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: '一级 2',
-        children: [{
-          id: 5,
-          label: '二级 2-1'
-        }, {
-          id: 6,
-          label: '二级 2-2'
-        }]
-      }, {
-        id: 3,
-        label: '一级 3',
-        children: [{
-          id: 7,
-          label: '二级 3-1'
-        }, {
-          id: 8,
-          label: '二级 3-2'
-        }]
-      }],
+      permData: [], // 分配权限时树形结构遍历的数据
       defaultProps: {
         children: 'children',
-        label: 'label'
-      }
+        label: 'name'
+      },
+      permIds: [], // 存放权限id
+      currentId: '' // 记录当前点击的id
 
     }
   },
@@ -199,6 +174,7 @@ export default {
   created() {
     this.getRoleList()
     this.getCompanyInfo()
+    this.getPermissionList()
   },
   methods: {
     async getRoleList() {
@@ -297,8 +273,44 @@ export default {
       this.dialogFormVisible = true
       this.statueCode = statueCode
     },
-    assignPerm() {
+    async assignPerm(id) {
+      // 展开分配权限的弹窗
       this.showPermDialog = true
+      this.currentId = id
+      // 调用接口获取角色信息
+      const { permIds } = await getRoleInfo(id)
+      // 记录当前角色所拥有的权限id
+      this.permIds = permIds
+    },
+    btnAssignCancel() {
+      // 关闭弹窗
+      this.showPermDialog = false
+      // 情空权限id
+      this.permIds = []
+    },
+    async btnAssignOk() {
+      console.log('ok')
+      try {
+        // 调用接口完成权限分配
+        await assignPerm({ id: this.currentId, permIds: this.permIds })
+        // 关闭弹窗
+        this.btnAssignCancel()
+        // 消息提醒
+        this.$message.success('权限分配完成')
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async getPermissionList() {
+      try {
+        this.permData = tranListToTreeData(await getPermissionList(), '0')
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    handleNodeClick() {
+      // 把被选中的权限id放入对应的数组中，
+      this.permIds = this.$refs.treeData.getCheckedKeys()
     }
   }
 
