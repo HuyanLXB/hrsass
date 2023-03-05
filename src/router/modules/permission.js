@@ -4,7 +4,7 @@ import layout from '@/layout'
 // 设置本模块对应的路由规则并导出
 export default {
   path: '/permission',
-  name: 'permission',
+  name: 'permissions',
   component: layout,
   children: [{
     path: '', // 二级路由不写路径表示是默认路由

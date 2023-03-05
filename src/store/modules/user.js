@@ -2,7 +2,7 @@
 import { getToken, setToken, removeToken, setTimeStamp } from '@/utils/auth'
 // 导入登录接口
 import { login, getUserInfo, getUserInfoById } from '@/api/user'
-
+import { resetRouter } from '@/router'
 // 状态
 const state = {
   // 定义用户的token
@@ -71,6 +71,11 @@ const actions = {
     context.commit('removeUserInfo')
     // 清空token
     context.commit('removeToken')
+    // 重置路由
+    resetRouter()
+    // 清空vuex中记录的路由信息
+    // 子模块调用子模块的action 可以 将 commit的第三个参数 设置成  { root: true } 就表示当前的context不是子模块了 而是父模块
+    context.commit('permission/setRutes', [], { root: true })
   }
 }
 

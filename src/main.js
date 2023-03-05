@@ -21,6 +21,10 @@ Vue.use(Components) // 对自己的插件进行全局注册
 // 注册打印插件
 import Print from 'vue-print-nb'
 Vue.use(Print)
+// 引入混入函数
+import checkPermission from '@/mixin/checkPermission'
+// 全局混入
+Vue.mixin(checkPermission)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

@@ -6,7 +6,8 @@
           slot="after"
           size="small"
           type="primary"
-          @click="changePerm(1)"
+          :disabled="!checkPermission('aa')"
+          @click="changePerm(1,'0')"
         >添加权限</el-button>
       </PageToll>
       <!-- 权限的表单部分 -->
@@ -100,7 +101,7 @@ export default {
       },
       showText: '',
       statueCode: 0,
-      currentPermID: ''
+      currentPermID: '0'// 新增根节点权限时的pid
     }
   },
   created() {
@@ -126,11 +127,15 @@ export default {
       } else {
         this.showText = '编辑权限点'
         // 1.根据id获取权限详情，实现数据回写
-        this.permFormData = await getPermissionDetail(this.currentPermID)
+        const res = await getPermissionDetail(permId)
+        console.log(res)
+        this.permFormData = res
       }
       // 展现弹窗
       this.changePermShow = true
       this.statueCode = staueCode
+      this.permFormData.type = staueCode
+      this.permFormData.pid = permId // 新增子节点的pid就是点击的父节点的id
       this.currentPermID = permId
     },
     btnCancel() {
@@ -181,6 +186,12 @@ export default {
             try {
               // 2.调用接口完成数据更新
               await updatePermission(this.permFormData)
+              // 重新拉取数据
+              this.loadPermissionList()
+              // 关闭弹窗
+              this.changePermShow = false
+              // 消息提醒
+              this.$message.success('编辑权限点成功')
             } catch (error) {
               console.log(error)
             }

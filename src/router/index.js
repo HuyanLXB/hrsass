@@ -71,13 +71,13 @@ export const constantRoutes = [
       path: '', // 二级路由不写路径表示是默认路由
       component: () => import('@/components/UploadExcel')
     }]
-  },
+  }
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+
 ]
 
-// 定义动态路由
+// 定义动态路由 需要对应的权限才能够访问
 export const asyncRoutes = [
   approvalsRouter,
   employeesRouter,
@@ -93,12 +93,13 @@ const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
   // 将动态路由和静态路由进行临时合并
-  routes: [...constantRoutes, ...asyncRoutes]
+  routes: [...constantRoutes]
 })
 
 const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
+// 重置路由方法 清空加入的动态路由
 export function resetRouter() {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router
