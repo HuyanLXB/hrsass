@@ -21,7 +21,11 @@
               <el-table-column label="操作">
                 <!-- 作用域插槽 row 能获取到点击那一行的数据对象 -->
                 <template slot-scope="{ row }">
-                  <el-button size="small" type="success">分配权限</el-button>
+                  <el-button
+                    size="small"
+                    type="success"
+                    @click="assignPerm"
+                  >分配权限</el-button>
                   <el-button
                     size="small"
                     type="primary"
@@ -94,11 +98,32 @@
         </div>
       </el-dialog>
 
+      <!-- 给角色分配权限时的弹窗 -->
+      <el-dialog
+        :visible.sync="showPermDialog"
+        title="分配权限"
+      >
+        <el-tree
+          :data="data"
+          show-checkbox
+          node-key="id"
+          :default-expand-all="true"
+          :check-strictly="true"
+          :props="defaultProps"
+        />
+        <!-- 底部确认标签 -->
+        <el-row type="flex" justify="center">
+          <el-col :span="6">
+            <el-button size="small">取消</el-button>
+            <el-button type="primary" size="small">确认</el-button>
+          </el-col>
+        </el-row>
+      </el-dialog>
     </div>
   </div>
 </template>
 <script>
-import { getRoleList, getCompanyInfo, deleteRole, updateRole, getRoleInfo, addRole } from '@/api/setting'
+import { getRoleList, getCompanyInfo, deleteRole, updateRole, getRoleInfo, addRole, assignPerm } from '@/api/setting'
 import { mapGetters } from 'vuex'
 export default {
   name: 'Setting',
@@ -124,7 +149,47 @@ export default {
       rule: {
         name: [{ required: true, message: '名称不能为空', trigger: 'blur' }]
       },
-      statueCode: 'add'
+      statueCode: 'add',
+      showPermDialog: false,
+      data: [{
+        id: 1,
+        label: '一级 1',
+        children: [{
+          id: 4,
+          label: '二级 1-1',
+          children: [{
+            id: 9,
+            label: '三级 1-1-1'
+          }, {
+            id: 10,
+            label: '三级 1-1-2'
+          }]
+        }]
+      }, {
+        id: 2,
+        label: '一级 2',
+        children: [{
+          id: 5,
+          label: '二级 2-1'
+        }, {
+          id: 6,
+          label: '二级 2-2'
+        }]
+      }, {
+        id: 3,
+        label: '一级 3',
+        children: [{
+          id: 7,
+          label: '二级 3-1'
+        }, {
+          id: 8,
+          label: '二级 3-2'
+        }]
+      }],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      }
 
     }
   },
@@ -231,6 +296,9 @@ export default {
     addRole(statueCode) {
       this.dialogFormVisible = true
       this.statueCode = statueCode
+    },
+    assignPerm() {
+      this.showPermDialog = true
     }
   }
 
