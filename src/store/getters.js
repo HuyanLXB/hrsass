@@ -7,6 +7,7 @@ const getters = {
   userId: state => state.user.userInfo.userId,
   image: state => state.user.userInfo.staffPhoto,
   companyId: state => state.user.userInfo.companyId,
+  department: state => state.user.userInfo.departmentName,
   routes: state => state.permission.rutes
 }
 export default getters
