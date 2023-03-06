@@ -1,20 +1,50 @@
-// 导出所需要要的整体布局
-import layout from '@/layout'
 
-// 设置本模块对应的路由规则并导出
+import Layout from '@/layout'
+
 export default {
-  path: '/social',
+  path: '/social_securitys',
+  component: Layout,
   name: 'social_securitys',
-  component: layout,
-  children: [{
-    path: '', // 二级路由不写路径表示是默认路由
-    component: () => import('@/views/social'),
-    // 路由元信息 实际上就是存放数据的对象
-    meta: {
-      // meta属性的里面的属性 随意定义
-      // 但是这里为什么要用title呢， 因为左侧导航会读取我们的路由里的meta里面的title作为显示菜单名称
-      title: '社保',
-      icon: 'table'
+  children: [
+    {
+      path: '',
+      component: () => import('@/views/social'),
+      name: 'social_securitys',
+      meta: {
+        title: '社保',
+        icon: 'table'
+
+      }
+    },
+    // 报表
+    {
+      path: 'detail/:id',
+      hidden: true,
+      component: () => import('@/views/social/detail'),
+      name: 'socialDetail',
+      meta: {
+        title: '社保'
+      }
+    },
+    // 历史归档
+    {
+      path: 'historicalArchiving',
+      hidden: true,
+      component: () => import('@/views/social/historical'),
+      name: 'socialHistorical',
+      meta: {
+        title: '历史归档'
+      }
+    },
+    // 月报表
+    {
+      path: 'monthStatement',
+      component: () => import('@/views/social/month'),
+      name: 'socialMonthStatement',
+      hidden: true,
+      meta: {
+        title: '当月报表'
+      }
     }
-  }]
+  ]
 }

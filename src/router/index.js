@@ -9,6 +9,7 @@ import attendancesRouter from './modules/attendances'
 import salarysRouter from './modules/salarys'
 import settingRouter from './modules/setting'
 import socialRouter from './modules/social'
+import userRouter from './modules/user'
 Vue.use(Router)
 
 /* Layout */
@@ -71,7 +72,8 @@ export const constantRoutes = [
       path: '', // 二级路由不写路径表示是默认路由
       component: () => import('@/components/UploadExcel')
     }]
-  }
+  },
+  userRouter
 
   // 404 page must be placed at the end !!!
 
