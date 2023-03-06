@@ -24,7 +24,8 @@
           <div slot="header" class="header">
             <span>工作日历</span>
           </div>
-        <!-- 放置日历组件 -->
+          <!-- 放置日历组件 -->
+          <WorkCalender />
         </el-card>
         <!-- 公告 -->
         <el-card class="box-card">
@@ -120,15 +121,19 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
+import WorkCalender from './components/work-calendar.vue'
 export default {
   name: 'Dashboard',
+  components: {
+    WorkCalender
+  },
   computed: {
     ...mapGetters([
       'name',
       'department'
     ])
   }
+
 }
 </script>
 
