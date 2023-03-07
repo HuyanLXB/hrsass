@@ -9,7 +9,13 @@
     <!-- <breadcrumb class="breadcrumb-container" /> -->
 
     <div class="right-menu">
+      <!-- 主题切换 -->
+      <ThemPicker class="right-menu-item" />
+      <!-- 主题切换 -->
+      <!-- 全屏切换 -->
       <screen-full class="right-menu-item" />
+      <!-- 全屏切换 -->
+
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img v-imageError="defaultImg" :src="image" class="user-avatar">
