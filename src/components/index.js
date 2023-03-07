@@ -5,6 +5,7 @@ import ImgUpload from '@/components/ImageUpload'
 import ScreenFull from '@/components/ScreenFull'
 import ThemPicker from './ThemePicker'
 import LangChange from './lang'
+import TagsView from './TagsView'
 export default {
   install(Vue) {
     Vue.component('PageToll', PageToll) // 全局注册一个工具栏
@@ -13,5 +14,6 @@ export default {
     Vue.component('ScreenFull', ScreenFull) // 全局注册一个全屏切换组件
     Vue.component('ThemPicker', ThemPicker) // 全局注册一个主体切换组件
     Vue.component('LangChange', LangChange) // 全局注册一个语言切换组件
+    Vue.component('TagsView', TagsView)// 全局注册一个多页签组件
   }
 }
