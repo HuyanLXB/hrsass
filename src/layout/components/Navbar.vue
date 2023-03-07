@@ -9,6 +9,8 @@
     <!-- <breadcrumb class="breadcrumb-container" /> -->
 
     <div class="right-menu">
+      <!-- 语言切换 -->
+      <LangChange class="right-menu-item" />
       <!-- 主题切换 -->
       <ThemPicker class="right-menu-item" />
       <!-- 主题切换 -->

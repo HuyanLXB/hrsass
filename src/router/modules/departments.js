@@ -7,6 +7,8 @@ export default {
   name: 'departments',
   component: layout,
   children: [{
+    name: 'departments',
+
     path: '', // 二级路由不写路径表示是默认路由
     component: () => import('@/views/departments'),
     // 路由元信息 实际上就是存放数据的对象
